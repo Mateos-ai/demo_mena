@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mateos — The Last Mile, First Class</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --base:#0F0B24; --base2:#171232; --panel:#1C1640;
+    --amber:#FF8C42; --indigo:#5B53E8; --teal:#17BEBB;
+    --white:#FFFFFF; --mute:#B7B1D8; --faint:#8E88B5;
+    --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.14);
+    --glass:rgba(255,255,255,.04);
+    --r:20px; --r-lg:28px;
+    --maxw:1120px;
+    --font-display:'Bricolage Grotesque','Hanken Grotesk',system-ui,sans-serif;
+    --font-body:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font-body);
+    background:var(--base);color:var(--white);line-height:1.6;-webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* ambient background orbs */
+  .bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+  .bg::before,.bg::after{content:"";position:absolute;border-radius:50%;filter:blur(110px);opacity:.5}
+  .bg::before{width:620px;height:620px;background:radial-gradient(circle,#5B53E8,transparent 70%);top:-220px;right:-160px}
+  .bg::after{width:560px;height:560px;background:radial-gradient(circle,#17BEBB,transparent 70%);bottom:-200px;left:-200px;opacity:.32}
+  .grid-tex{position:fixed;inset:0;z-index:-1;
+    background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+    background-size:64px 64px;mask-image:radial-gradient(circle at 50% 0%,#000,transparent 75%)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  h1,h2,h3,h4,.brand{font-family:var(--font-display);letter-spacing:-.02em}
+  .grad{background:linear-gradient(100deg,var(--amber),#ff6f91 45%,var(--indigo));-webkit-background-clip:text;background-clip:text;color:transparent}
+  a{color:inherit}
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(15,11,36,.6);border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
+  nav.scrolled{border-bottom:1px solid var(--line);background:rgba(15,11,36,.82)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:var(--maxw);margin:0 auto}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px}
+  .brand svg{width:28px;height:28px}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#FFA15C,#FF7A3C);
+    color:#2A1606;font-weight:700;font-family:var(--font-display);padding:13px 22px;border-radius:999px;
+    text-decoration:none;font-size:15px;border:0;cursor:pointer;
+    box-shadow:0 10px 30px -6px rgba(255,140,66,.5);transition:transform .18s ease,box-shadow .18s ease}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 16px 40px -8px rgba(255,140,66,.6)}
+  .btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .btn.ghost{background:transparent;color:var(--white);border:1px solid var(--line-2);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--white);background:rgba(255,255,255,.04)}
+  .nav-cta{padding:10px 18px;font-size:14px}
+  /* hero */
+  .hero{text-align:center;padding:84px 0 36px;max-width:840px;margin:0 auto}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--teal);
+    background:rgba(23,190,187,.10);border:1px solid rgba(23,190,187,.28);padding:7px 15px;border-radius:999px;
+    letter-spacing:.04em;margin-bottom:26px}
+  .pill .d{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal)}
+  h1{font-size:clamp(40px,6vw,68px);line-height:1.03;font-weight:800;margin-bottom:22px}
+  .sub{font-size:clamp(17px,2.2vw,21px);color:var(--mute);max-width:600px;margin:0 auto 32px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:center}
+  .trust{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:24px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--mute);
+    background:var(--glass);border:1px solid var(--line);padding:7px 14px;border-radius:999px}
+  .chip svg{width:14px;height:14px;stroke:var(--teal);flex:0 0 14px}
+  /* media frame */
+  .frame{position:relative;margin:60px auto 0;border-radius:var(--r-lg);padding:10px;
+    background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.02));
+    border:1px solid var(--line);box-shadow:0 40px 90px -30px rgba(0,0,0,.7)}
+  .media{border-radius:20px;overflow:hidden;aspect-ratio:16/9;position:relative;
+    background:radial-gradient(120% 120% at 50% 0%,#241b52,#150f31);display:flex;align-items:center;justify-content:center}
+  .play{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#FFA15C,#FF7A3C);display:flex;
+    align-items:center;justify-content:center;box-shadow:0 14px 44px rgba(255,140,66,.5);transition:transform .2s}
+  .frame:hover .play{transform:scale(1.06)}
+  .play:after{content:"";border-left:24px solid #2A1606;border-top:15px solid transparent;border-bottom:15px solid transparent;margin-left:6px}
+  .media .cap{position:absolute;bottom:16px;left:18px;color:var(--faint);font-size:12px;letter-spacing:1.5px}
+  /* pedigree */
+  .pedigree{margin:64px 0 0;text-align:center}
+  .pedigree .cap{color:var(--faint);font-size:12px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px}
+  .logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0}
+  .logos .lg{font-size:23px;font-weight:700;color:#d6d1f2;opacity:.8;padding:0 30px;position:relative;font-family:var(--font-display)}
+  .logos .lg + .lg::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:1px;height:22px;background:var(--line-2)}
+  .logos .serif{font-family:Georgia,serif}
+  /* sections */
+  section{padding:88px 0}
+  .eyebrow{color:var(--teal);font-weight:600;letter-spacing:.16em;font-size:13px;text-transform:uppercase;margin-bottom:14px}
+  h2{font-size:clamp(30px,4vw,42px);font-weight:800;line-height:1.1;margin-bottom:14px}
+  .lead{color:var(--mute);font-size:18px;max-width:640px;margin-bottom:8px}
+  .center{text-align:center}.center .lead{margin-left:auto;margin-right:auto}
+  /* bento product grid */
+  .bento{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+  .card{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(10px);
+    transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;position:relative;overflow:hidden}
+  .card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:0 24px 50px -24px rgba(0,0,0,.6)}
+  .feature{padding:26px}
+  .ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;
+    background:rgba(255,255,255,.05);border:1px solid var(--line)}
+  .ic svg{width:22px;height:22px;stroke-width:1.8}
+  .feature h4{font-size:18px;margin-bottom:7px}
+  .feature p{color:var(--mute);font-size:14.5px}
+  .shot{aspect-ratio:16/10;background:radial-gradient(120% 120% at 50% 0%,#241b52,#150f31);
+    display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
+  .shot span{color:var(--faint);font-size:11.5px;letter-spacing:1px;text-align:center;padding:0 16px}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .stat{padding:30px;text-align:left}
+  .stat b{font-family:var(--font-display);font-size:46px;display:block;font-weight:800;line-height:1}
+  .stat .a{color:var(--amber)} .stat .t{color:var(--teal)} .stat .i{color:var(--indigo)}
+  .stat p{color:var(--mute);font-size:14px;margin-top:10px}
+  /* compare */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:36px}
+  .col{padding:30px}
+  .col.eco{opacity:.9}
+  .col.fc{background:linear-gradient(160deg,rgba(255,140,66,.14),rgba(91,83,232,.12));border-color:rgba(255,140,66,.35)}
+  .col h3{font-family:var(--font-display);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px}
+  .col.eco h3{color:var(--faint)} .col.fc h3{color:var(--amber)}
+  .col li{list-style:none;display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);color:#e3def7;font-size:15.5px}
+  .col li:first-of-type{border-top:none}
+  .col li svg{width:18px;height:18px;flex:0 0 18px;margin-top:3px}
+  .x{color:var(--faint)} .ck{color:var(--teal)}
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;position:relative}
+  .step{padding:28px}
+  .num{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:800;color:#2A1606;margin-bottom:16px;font-size:17px}
+  .step:nth-child(1) .num{background:var(--amber)}
+  .step:nth-child(2) .num{background:var(--teal)}
+  .step:nth-child(3) .num{background:var(--indigo);color:#fff}
+  .step h4{font-size:18px;margin-bottom:8px}
+  .step p{color:var(--mute);font-size:14.5px}
+  /* team */
+  .team{padding:52px;text-align:center}
+  .team .lead{margin:0 auto 26px}
+  /* closing */
+  .closing{border-radius:var(--r-lg);padding:60px;text-align:center;position:relative;overflow:hidden;
+    background:linear-gradient(160deg,#221a4f,#191338);border:1px solid var(--line-2)}
+  .closing::before{content:"";position:absolute;width:400px;height:400px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,140,66,.4),transparent 70%);filter:blur(80px);top:-180px;left:50%;transform:translateX(-50%)}
+  .closing>*{position:relative}
+  .closing .lead{margin:0 auto 28px}
+  footer{border-top:1px solid var(--line);padding:34px 0;color:var(--faint);font-size:13px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  /* audit lead form */
+  .audit-form{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:540px;margin:0 auto}
+  .audit-input{flex:1;min-width:240px;background:rgba(255,255,255,.05);border:1px solid var(--line-2);
+    border-radius:999px;padding:14px 20px;color:var(--white);font-size:15px;font-family:var(--font-body);transition:border-color .2s,box-shadow .2s}
+  .audit-input::placeholder{color:var(--faint)}
+  .audit-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(23,190,187,.18)}
+  .audit-form .btn{flex:0 0 auto;cursor:pointer}
+  .audit-form .btn:disabled{opacity:.75;cursor:default}
+  .audit-form .btn.is-ok{background:linear-gradient(135deg,#1fd3d0,#0f8f8d);color:#04201f;box-shadow:0 10px 30px -6px rgba(23,190,187,.5)}
+  .audit-success{color:var(--teal);font-weight:600;margin:18px auto 0;font-size:15.5px;max-width:520px}
+  .audit-note{color:var(--faint);font-size:13px;margin-top:14px}
+  @media(max-width:520px){.audit-form .btn{width:100%;justify-content:center}}
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+  @media(max-width:820px){
+    .bento,.stats,.compare,.steps{grid-template-columns:1fr}
+    section{padding:60px 0}
+    .closing,.team{padding:34px 22px}
+    .logos .lg{padding:8px 18px;font-size:18px} .logos .lg + .lg::before{display:none}
+    .demo-body{min-height:0}
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     SELF-PLAYING DEMOS  (gif-style — no clicks required)
+     ─────────────────────────────────────────────────────────── */
+  .demo{position:relative;border-radius:20px;overflow:hidden;
+    background:radial-gradient(130% 130% at 50% 0%,#241b52,#130d2c);border:1px solid var(--line)}
+  .demo-chrome{display:flex;align-items:center;gap:8px;padding:12px 16px;
+    background:rgba(255,255,255,.03);border-bottom:1px solid var(--line)}
+  .demo-chrome .cd{width:11px;height:11px;border-radius:50%;flex:0 0 11px}
+  .cd.r{background:#FF5F57}.cd.a{background:#FEBC2E}.cd.g{background:#28C840}
+  .demo-url{flex:1;text-align:center;max-width:260px;margin:0 auto;
+    font-family:var(--font-mono);font-size:12px;color:var(--faint);
+    background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .demo-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:1px;color:var(--teal);font-weight:600}
+  .demo-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal);
+    box-shadow:0 0 8px var(--teal);animation:demoPulse 1.6s ease-in-out infinite}
+  @keyframes demoPulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .demo-body{padding:24px clamp(16px,4vw,38px);min-height:clamp(300px,38vw,420px);
+    display:flex;flex-direction:column;gap:14px;justify-content:flex-start}
+
+  .dm-msg{display:flex;gap:11px;align-items:flex-start;max-width:90%}
+  .dm-msg.me{align-self:flex-end;flex-direction:row-reverse}
+  .dm-av{width:30px;height:30px;border-radius:9px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:800;font-size:13px;color:#2A1606;background:linear-gradient(135deg,#FFA15C,#FF7A3C)}
+  .dm-av.teal{background:linear-gradient(135deg,#1fd3d0,#0f8f8d);color:#04201f}
+  .dm-msg.me .dm-av{background:rgba(255,255,255,.1);color:var(--white)}
+  .dm-bubble{background:rgba(255,255,255,.06);border:1px solid var(--line);padding:11px 14px;
+    border-radius:14px;border-top-left-radius:4px;font-size:14.5px;color:#ECE9FA;line-height:1.5}
+  .dm-msg.me .dm-bubble{background:linear-gradient(135deg,rgba(91,83,232,.4),rgba(91,83,232,.2));
+    border-color:rgba(91,83,232,.45);border-radius:14px;border-top-right-radius:4px}
+  .dm-typing{display:inline-flex;gap:5px;padding:13px 14px;align-items:center}
+  .dm-typing span{width:6px;height:6px;border-radius:50%;background:var(--mute);opacity:.5;animation:dmType 1.2s ease-in-out infinite}
+  .dm-typing span:nth-child(2){animation-delay:.18s}.dm-typing span:nth-child(3){animation-delay:.36s}
+  @keyframes dmType{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-4px);opacity:.9}}
+
+  .dm-card{background:rgba(255,255,255,.04);border:1px solid var(--line-2);border-radius:14px;overflow:hidden;margin-left:41px}
+  .dm-msg.me + .dm-card{margin-left:0;margin-right:41px}
+  .dm-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:12px 15px;border-bottom:1px solid var(--line);font-size:13px;color:var(--mute);font-weight:600}
+  .dm-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .dm-tag.amber{background:rgba(255,140,66,.16);color:var(--amber)}
+  .dm-tag.teal{background:rgba(23,190,187,.16);color:var(--teal)}
+  .dm-tag.indigo{background:rgba(91,83,232,.2);color:#b9b3ff}
+  .dm-row{display:flex;align-items:center;gap:12px;padding:10px 15px;border-top:1px solid var(--line);font-size:13.5px;color:#E3DEF7}
+  .dm-row:first-child{border-top:none}
+  .dm-time{font-family:var(--font-mono);font-size:12px;color:var(--faint);flex:0 0 42px}
+  .dm-row .gr{flex:1}
+  .dm-em-sub{padding:12px 15px;font-weight:600;font-size:14px;border-bottom:1px solid var(--line)}
+  .dm-em-from{font-size:12px;color:var(--faint);font-weight:400;margin-top:3px}
+  .dm-em-body{padding:13px 15px;font-size:14px;color:#D9D4F0;line-height:1.65;min-height:46px}
+  .tw-caret{display:inline-block;width:7px;height:15px;vertical-align:-2px;background:var(--amber);margin-left:1px;animation:demoPulse .8s steps(1) infinite}
+  .dm-actions{display:flex;gap:10px;padding:13px 15px;border-top:1px solid var(--line);align-items:center}
+  .dm-btn{font-family:var(--font-display);font-weight:700;font-size:13px;padding:9px 16px;border-radius:9px;
+    border:1px solid var(--line-2);background:rgba(255,255,255,.05);color:var(--white);cursor:default;
+    display:inline-flex;align-items:center;gap:7px;transition:background .3s,color .3s}
+  .dm-btn-primary{background:linear-gradient(135deg,#FFA15C,#FF7A3C);color:#2A1606;border:0}
+  .dm-btn.press{animation:dmPress .5s ease}
+  @keyframes dmPress{0%{box-shadow:0 0 0 0 rgba(255,140,66,.5)}45%{transform:scale(.93);box-shadow:0 0 0 7px rgba(255,140,66,.22)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,140,66,0)}}
+  .dm-btn.dm-pressed{background:linear-gradient(135deg,#1fd3d0,#0f8f8d);color:#04201f}
+  .dm-status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--teal);
+    font-family:var(--font-mono);margin-left:41px}
+  .dm-status svg{width:15px;height:15px;flex:0 0 15px;stroke:var(--teal)}
+
+  /* beat reveal (engine-driven) */
+  .demo [data-beat]{opacity:0;transform:translateY(10px);transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
+  .demo [data-beat].in{opacity:1;transform:none}
+  .demo [data-until].out{opacity:0;max-height:0!important;min-height:0!important;margin-top:-14px;
+    padding-top:0;padding-bottom:0;overflow:hidden;transition:all .45s ease}
+
+  /* ── micro-gif: integrations flowing in ── */
+  .mgif{margin:18px -26px -26px;height:188px;overflow:hidden;position:relative;
+    background:radial-gradient(120% 120% at 50% 0%,#221a4d,#140e30);border-top:1px solid var(--line)}
+  .ig{display:flex;align-items:center;gap:10px;padding:22px;height:100%}
+  .ig-rows{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
+  .ig-row{display:flex;align-items:center;gap:0}
+  .ig-chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#E3DEF7;
+    background:rgba(255,255,255,.05);border:1px solid var(--line-2);border-radius:9px;padding:6px 10px;white-space:nowrap;flex:0 0 auto}
+  .ig-chip .d{width:7px;height:7px;border-radius:50%}
+  .ig-wire{flex:1;height:2px;background:var(--line-2);position:relative;margin-left:-1px}
+  .ig-dot{position:absolute;top:-3px;left:0;width:8px;height:8px;border-radius:50%;
+    background:var(--teal);box-shadow:0 0 9px var(--teal);opacity:0;animation:igFlow 2.4s linear infinite}
+  .ig-row:nth-child(2) .ig-dot{animation-delay:.8s;background:var(--amber);box-shadow:0 0 9px var(--amber)}
+  .ig-row:nth-child(3) .ig-dot{animation-delay:1.6s;background:#7d76ff;box-shadow:0 0 9px #5B53E8}
+  @keyframes igFlow{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:100%;opacity:0}}
+  .ig-hub{flex:0 0 auto;width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.05);border:1px solid var(--line-2);position:relative}
+  .ig-hub svg{width:30px;height:30px}
+  .ig-hub::after{content:"";position:absolute;inset:-1px;border-radius:15px;border:1.5px solid var(--teal);
+    opacity:0;animation:igHub 2.4s ease-out infinite}
+  @keyframes igHub{0%,55%{opacity:0;transform:scale(1)}70%{opacity:.7;transform:scale(1.12)}100%{opacity:0;transform:scale(1.22)}}
+
+  /* ── micro-gif: tasks auto-checking ── */
+  .tk{padding:18px 22px;height:100%;display:flex;flex-direction:column;gap:11px;justify-content:center}
+  .tk-row{display:flex;align-items:center;gap:11px;font-size:12.5px;color:#D9D4F0}
+  .tk-box{width:18px;height:18px;border-radius:6px;border:1.6px solid var(--line-2);flex:0 0 18px;position:relative}
+  .tk-fill{position:absolute;inset:-1.6px;border-radius:6px;background:linear-gradient(135deg,#1fd3d0,#0f8f8d);
+    display:flex;align-items:center;justify-content:center;opacity:0}
+  .tk-fill svg{width:11px;height:11px;stroke:#04201f;stroke-width:3.4}
+  .tk-row .gr{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tk-done{font-size:10.5px;font-weight:700;color:var(--teal);font-family:var(--font-mono);opacity:0}
+  .tk-row:nth-child(1) .tk-fill,.tk-row:nth-child(1) .tk-done{animation:tkOn1 5s ease infinite}
+  .tk-row:nth-child(2) .tk-fill,.tk-row:nth-child(2) .tk-done{animation:tkOn2 5s ease infinite}
+  .tk-row:nth-child(3) .tk-fill,.tk-row:nth-child(3) .tk-done{animation:tkOn3 5s ease infinite}
+  .tk-row:nth-child(4) .tk-fill,.tk-row:nth-child(4) .tk-done{animation:tkOn4 5s ease infinite}
+  @keyframes tkOn1{0%,6%{opacity:0;transform:scale(.5)}12%,90%{opacity:1;transform:scale(1)}96%,100%{opacity:0;transform:scale(.5)}}
+  @keyframes tkOn2{0%,18%{opacity:0;transform:scale(.5)}24%,90%{opacity:1;transform:scale(1)}96%,100%{opacity:0;transform:scale(.5)}}
+  @keyframes tkOn3{0%,30%{opacity:0;transform:scale(.5)}36%,90%{opacity:1;transform:scale(1)}96%,100%{opacity:0;transform:scale(.5)}}
+  @keyframes tkOn4{0%,42%{opacity:0;transform:scale(.5)}48%,90%{opacity:1;transform:scale(1)}96%,100%{opacity:0;transform:scale(.5)}}
+
+  /* ── micro-gif: auto-approval ── */
+  .ap{padding:20px 22px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:16px}
+  .ap-head{font-size:13px;color:#E3DEF7;font-weight:600;line-height:1.4}
+  .ap-head .m{display:block;font-size:11.5px;color:var(--faint);font-weight:400;margin-top:4px;font-family:var(--font-mono)}
+  .ap-foot{position:relative;min-height:40px}
+  .ap-btns{display:flex;gap:9px;animation:apBtns 5s ease infinite}
+  .ap-btn{font-family:var(--font-display);font-weight:700;font-size:12.5px;padding:8px 15px;border-radius:8px;border:1px solid var(--line-2);background:rgba(255,255,255,.05);color:var(--white)}
+  .ap-btn.ok{background:linear-gradient(135deg,#1fd3d0,#0f8f8d);color:#04201f;border:0;animation:apPress 5s ease infinite}
+  .ap-cursor{position:absolute;left:118px;top:6px;font-size:15px;color:var(--white);
+    text-shadow:0 1px 3px rgba(0,0,0,.5);opacity:0;animation:apTap 5s ease infinite;pointer-events:none}
+  .ap-done{position:absolute;inset:0;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;
+    color:var(--teal);font-family:var(--font-mono);opacity:0;animation:apDone 5s ease infinite}
+  .ap-done svg{width:16px;height:16px;stroke:var(--teal)}
+  @keyframes apTap{0%{opacity:0;transform:translate(22px,10px)}24%{opacity:1;transform:translate(0,0)}
+    34%{transform:translate(0,4px)}42%{transform:translate(0,0)}55%,100%{opacity:0;transform:translate(0,0)}}
+  @keyframes apPress{0%,32%{box-shadow:0 0 0 0 rgba(23,190,187,0)}40%{transform:scale(.93);box-shadow:0 0 0 7px rgba(23,190,187,.25)}48%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(23,190,187,0)}}
+  @keyframes apBtns{0%,48%{opacity:1;transform:none}56%,92%{opacity:0;transform:translateY(-4px)}97%,100%{opacity:1;transform:none}}
+  @keyframes apDone{0%,50%{opacity:0;transform:translateY(6px)}60%,90%{opacity:1;transform:translateY(0)}97%,100%{opacity:0;transform:translateY(6px)}}
+
+  @media(prefers-reduced-motion:reduce){
+    .ig-dot,.ig-hub::after,.demo-live::before,.tk-fill,.tk-done,.ap-btns,.ap-btn.ok,.ap-cursor,.ap-done,.dm-typing span{animation:none!important}
+    .tk-fill,.tk-done{opacity:1!important;transform:none!important}.ap-cursor{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="grid-tex"></div>
+
+<nav id="nav">
+  <div class="nav-in">
+    <div class="brand">
+      <svg viewBox="43 43 114 114" xmlns="http://www.w3.org/2000/svg" aria-label="Mateos.ai logo">
+        <circle cx="130" cy="70" r="27" fill="#FF8C42"/><circle cx="70" cy="130" r="27" fill="#17BEBB"/><circle cx="130" cy="130" r="27" fill="#5B53E8"/>
+      </svg>
+      mateos.ai
+    </div>
+    <a class="btn nav-cta" href="#audit">Book your private audit</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="pill"><span class="d"></span> The last mile, first class</span>
+    <h1>Most AI never lands.<br><span class="grad">Yours arrives first class.</span></h1>
+    <p class="sub">Bespoke AI, built into your operations and handed over running. Live in weeks, not quarters.</p>
+    <div class="cta-row">
+      <a class="btn" href="#audit">Book your private AI audit</a>
+    </div>
+    <div class="trust">
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> On the ground in the UAE</span>
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg> Live in 2 weeks</span>
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Fixed scope, fixed fee</span>
+    </div>
+  </header>
+
+  <div class="frame reveal" id="film">
+    <div class="demo" data-demo="brief" data-timing="500,1200,1100,1500,700,900,2600,900,1100,3400">
+      <div class="demo-chrome">
+        <span class="cd r"></span><span class="cd a"></span><span class="cd g"></span>
+        <span class="demo-url">app.mateos.ai</span>
+        <span class="demo-live">LIVE</span>
+      </div>
+      <div class="demo-body">
+        <div class="dm-msg" data-beat="0" data-until="1">
+          <span class="dm-av">M</span>
+          <div class="dm-bubble dm-typing"><span></span><span></span><span></span></div>
+        </div>
+        <div class="dm-msg" data-beat="1">
+          <span class="dm-av">M</span>
+          <div class="dm-bubble">☀️ Good morning, David — you have 3 meetings and 6 follow-ups waiting. Want me to clear them?</div>
+        </div>
+        <div class="dm-card" data-beat="2">
+          <div class="dm-card-head"><span>Today · Tue, Jun 24</span><span class="dm-tag amber">3 meetings</span></div>
+          <div class="dm-row"><span class="dm-time">09:00</span><span class="gr">Acme Corp — discovery call</span><span class="dm-tag teal">Prep ready</span></div>
+          <div class="dm-row"><span class="dm-time">11:30</span><span class="gr">Dana Lee — check-in</span><span class="dm-tag teal">Prep ready</span></div>
+        </div>
+        <div class="dm-msg me" data-beat="3">
+          <span class="dm-av">D</span>
+          <div class="dm-bubble">Draft the follow-up to Sarah from Acme</div>
+        </div>
+        <div class="dm-msg" data-beat="4" data-until="5">
+          <span class="dm-av">M</span>
+          <div class="dm-bubble dm-typing"><span></span><span></span><span></span></div>
+        </div>
+        <div class="dm-card" data-beat="5">
+          <div class="dm-em-sub">Re: Acme × Mateos — next steps<div class="dm-em-from">To: sarah@acme.com · drafted from Tuesday's call</div></div>
+          <div class="dm-em-body" data-type="Hi Sarah — great chatting Tuesday. Here's the ROI breakdown for your team, plus the two next steps we agreed on." data-beat="5" data-speed="20"></div>
+          <div class="dm-actions" data-beat="6">
+            <button class="dm-btn dm-btn-primary" data-press="7" data-label="Send" data-done="Sent"><span class="lbl">Send</span></button>
+            <button class="dm-btn">Edit</button>
+          </div>
+        </div>
+        <div class="dm-status" data-beat="8">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Sent · logged to CRM · drafted in 1.4s
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PEDIGREE  (swap text wordmarks for official logo SVGs when ready) -->
+  <div class="pedigree reveal">
+    <div class="cap">Built by a team that has worked and studied at</div>
+    <div class="logos">
+      <span class="lg">Google</span>
+      <span class="lg">Slack</span>
+      <span class="lg serif">MIT</span>
+    </div>
+  </div>
+
+  <!-- PRODUCT SHOWCASE -->
+  <section id="product">
+    <div class="eyebrow reveal">The product</div>
+    <h2 class="reveal">See Mateos at work</h2>
+    <p class="lead reveal">Not a concept. A working system inside the tools your team already uses, taking real actions every day.</p>
+
+    <div class="frame reveal" id="demo" style="margin-top:36px">
+      <div class="demo" data-demo="lead" data-timing="500,1100,1100,1400,700,900,2500,900,1100,3400">
+        <div class="demo-chrome">
+          <span class="cd r"></span><span class="cd a"></span><span class="cd g"></span>
+          <span class="demo-url">app.mateos.ai/inbox</span>
+          <span class="demo-live">LIVE</span>
+        </div>
+        <div class="demo-body">
+          <div class="dm-msg" data-beat="0" data-until="1">
+            <span class="dm-av teal">M</span>
+            <div class="dm-bubble dm-typing"><span></span><span></span><span></span></div>
+          </div>
+          <div class="dm-msg" data-beat="1">
+            <span class="dm-av teal">M</span>
+            <div class="dm-bubble">💬 New WhatsApp lead — Omar at Gulf Logistics just asked about enterprise pricing.</div>
+          </div>
+          <div class="dm-card" data-beat="2">
+            <div class="dm-card-head"><span>Gulf Logistics · Dubai</span><span class="dm-tag indigo">New lead</span></div>
+            <div class="dm-row"><span class="gr">Omar Al-Farsi · Head of Ops</span><span class="dm-tag teal">via WhatsApp</span></div>
+            <div class="dm-row"><span class="gr">Interest: fleet automation, 200+ vehicles</span></div>
+          </div>
+          <div class="dm-msg" data-beat="3" data-until="4">
+            <span class="dm-av teal">M</span>
+            <div class="dm-bubble">Added to CRM and created a deal. Here's a reply ready to go:</div>
+          </div>
+          <div class="dm-msg" data-beat="4" data-until="5">
+            <span class="dm-av teal">M</span>
+            <div class="dm-bubble dm-typing"><span></span><span></span><span></span></div>
+          </div>
+          <div class="dm-card" data-beat="5">
+            <div class="dm-card-head"><span>Reply to Omar</span><span class="dm-tag teal">WhatsApp</span></div>
+            <div class="dm-em-body" data-type="Hi Omar! Happy to help with fleet automation. I've put together pricing for 200+ vehicles — when's a good time this week for a quick call?" data-beat="5" data-speed="18"></div>
+            <div class="dm-actions" data-beat="6">
+              <button class="dm-btn dm-btn-primary" data-press="7" data-label="Send reply" data-done="Sent"><span class="lbl">Send reply</span></button>
+              <button class="dm-btn">Edit</button>
+            </div>
+          </div>
+          <div class="dm-status" data-beat="8">
+            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            Sent · CRM updated · deal created in 2.1s
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="reveal center" style="margin-top:80px">Built to do the work</h2>
+    <div class="bento">
+      <div class="card feature reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#17BEBB" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M5 8h14a0 0 0 0 1 0 0v3a7 7 0 0 1-14 0V8z"/><path d="M12 18v4"/></svg></div>
+        <span class="eyebrow" style="margin-bottom:6px">Works where you work</span>
+        <h4>Inside your stack</h4>
+        <p>Connects to your CRM, inbox, WhatsApp and tools — no rip-and-replace.</p>
+        <div class="mgif" aria-hidden="true">
+          <div class="ig">
+            <div class="ig-rows">
+              <div class="ig-row"><span class="ig-chip"><span class="d" style="background:#FF8C42"></span>CRM</span><span class="ig-wire"><i class="ig-dot"></i></span></div>
+              <div class="ig-row"><span class="ig-chip"><span class="d" style="background:#17BEBB"></span>Inbox</span><span class="ig-wire"><i class="ig-dot"></i></span></div>
+              <div class="ig-row"><span class="ig-chip"><span class="d" style="background:#25D366"></span>WhatsApp</span><span class="ig-wire"><i class="ig-dot"></i></span></div>
+            </div>
+            <div class="ig-hub">
+              <svg viewBox="43 43 114 114" xmlns="http://www.w3.org/2000/svg"><circle cx="130" cy="70" r="27" fill="#FF8C42"/><circle cx="70" cy="130" r="27" fill="#17BEBB"/><circle cx="130" cy="130" r="27" fill="#5B53E8"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card feature reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#FF8C42" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+        <span class="eyebrow" style="margin-bottom:6px">Takes initiative</span>
+        <h4>It does the work</h4>
+        <p>Drafts, follows up, updates records and flags what needs you — automatically.</p>
+        <div class="mgif" aria-hidden="true">
+          <div class="tk">
+            <div class="tk-row"><span class="tk-box"><span class="tk-fill"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></span><span class="gr">Replied to Omar — Gulf Logistics</span><b class="tk-done">done</b></div>
+            <div class="tk-row"><span class="tk-box"><span class="tk-fill"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></span><span class="gr">Logged 3 calls to the CRM</span><b class="tk-done">done</b></div>
+            <div class="tk-row"><span class="tk-box"><span class="tk-fill"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></span><span class="gr">Sent 4 follow-up emails</span><b class="tk-done">done</b></div>
+            <div class="tk-row"><span class="tk-box"><span class="tk-fill"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></span><span class="gr">Flagged 1 deal for your review</span><b class="tk-done">done</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="card feature reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#5B53E8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <span class="eyebrow" style="margin-bottom:6px">You stay in control</span>
+        <h4>Nothing without your say</h4>
+        <p>Set the rules. Approve before it acts. Full oversight of every automation.</p>
+        <div class="mgif" aria-hidden="true">
+          <div class="ap">
+            <div class="ap-head">Send invoice reminder to 12 clients<span class="m">Needs your approval · drafted by Mateos</span></div>
+            <div class="ap-foot">
+              <span class="ap-btns">
+                <button class="ap-btn">Hold</button>
+                <button class="ap-btn ok">Approve</button>
+              </span>
+              <span class="ap-cursor">▲</span>
+              <span class="ap-done"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Approved — running now</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="reveal center" style="margin-bottom:40px">The UAE leads the world in AI</h2>
+    <div class="stats">
+      <div class="card stat reveal"><b class="a">70.1%</b><p>UAE AI adoption — the highest on earth</p></div>
+      <div class="card stat reveal"><b class="t">17.8%</b><p>Global average — the UAE is in a league of its own</p></div>
+      <div class="card stat reveal"><b class="i">2 wks</b><p>From pilot to a system running in production</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow reveal">The difference</div>
+    <h2 class="reveal">Your AI is flying economy</h2>
+    <p class="lead reveal">Adoption isn't deployment. Most AI boards as a pilot, waits six months, and lands… maybe. We change the class of service.</p>
+    <div class="compare">
+      <div class="card col eco reveal">
+        <h3>Economy AI</h3>
+        <ul>
+          <li><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg> Starts as a pilot, stays a pilot</li>
+          <li><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg> Six months to “maybe”</li>
+          <li><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg> Lives in a slide deck</li>
+          <li><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg> A hire you’re still waiting on</li>
+        </ul>
+      </div>
+      <div class="card col fc reveal">
+        <h3>First-class AI</h3>
+        <ul>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Bespoke, built into how you work</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Live in ~2 weeks</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> A system running in production</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> White-glove, handed over and yours</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow reveal">How it works</div>
+    <h2 class="reveal">One workflow. Live. Then you expand.</h2>
+    <div class="steps">
+      <div class="card step reveal"><div class="num">1</div><h4>Private audit</h4><p>45 minutes, in person in the UAE or on a call. We map your highest-leverage workflow and tell you exactly what we’d ship.</p></div>
+      <div class="card step reveal"><div class="num">2</div><h4>The 2-Week Deployment</h4><p>Bespoke, fixed scope, fixed fee. We kick off on-site with your team and stay hands-on through go-live, in about two weeks.</p></div>
+      <div class="card step reveal"><div class="num">3</div><h4>Expand</h4><p>Prove one workflow, then scale across the business.</p></div>
+    </div>
+    <p class="lead reveal center" style="margin:28px auto 0">Hybrid by design: a senior team building behind the scenes, on the ground in the UAE for kickoff and go-live.</p>
+  </section>
+
+  <!-- TEAM / CREDIBILITY — capability, no names or faces -->
+  <section>
+    <div class="card team reveal">
+      <div class="eyebrow">The team behind it</div>
+      <h2>Senior by default</h2>
+      <p class="lead">A small, senior team of AI engineers and operators — with experience from Google, Slack and MIT — who build and ship production systems, not slideware. We stay deliberately lean, so your project is run by the people actually building it.</p>
+      <div class="logos">
+        <span class="lg">Google</span><span class="lg">Slack</span><span class="lg serif">MIT</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="audit">
+    <div class="closing reveal">
+      <h2>Ready to fly first class?</h2>
+      <p class="lead">A private, 45-minute audit. No deck. Just the one workflow worth automating first, and what it’d take to make it live.</p>
+      <form class="audit-form" id="audit-form" novalidate>
+        <input type="email" class="audit-input" placeholder="you@company.com" required autocomplete="email" aria-label="Your work email" />
+        <button type="submit" class="btn">Book your private AI audit</button>
+      </form>
+      <p class="audit-success" id="audit-success" hidden>✓ Thank you — we’ll be in touch within one business day to schedule your audit.</p>
+      <p class="audit-note">No deck, no spam. We’ll reach out to set up your audit.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="brand" style="font-size:16px"><svg viewBox="43 43 114 114" style="width:22px;height:22px"><circle cx="130" cy="70" r="27" fill="#FF8C42"/><circle cx="70" cy="130" r="27" fill="#17BEBB"/><circle cx="130" cy="130" r="27" fill="#5B53E8"/></svg> mateos.ai</div>
+    <div>The last mile of AI, delivered. · © 2026 Mateos</div>
+  </footer>
+
+</div>
+
+<script>
+  // sticky nav border on scroll
+  const nav=document.getElementById('nav');
+  addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>10),{passive:true});
+  // reveal on scroll (reduced-motion safe)
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in'));
+  }else{
+    const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+    document.querySelectorAll('.reveal').forEach(e=>io.observe(e));
+  }
+
+  // ── self-playing demo engine (gif-style chat sequences) ──
+  (function(){
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function typeText(el){
+      clearTimeout(el._tt);
+      const full = el.dataset.type || '';
+      const spd = +(el.dataset.speed || 22);
+      let caret = el.parentNode.querySelector('.tw-caret');
+      if(!caret){ caret=document.createElement('span'); caret.className='tw-caret'; }
+      let i = 0;
+      (function step(){
+        el.textContent = full.slice(0, i);
+        el.appendChild(caret);
+        if(i < full.length){ i++; el._tt = setTimeout(step, spd); }
+        else { el._tt = setTimeout(()=>{ if(caret.parentNode) caret.remove(); }, 600); }
+      })();
+    }
+    function boot(demo){
+      const beatEls = [...demo.querySelectorAll('[data-beat]')];
+      const maxBeat = beatEls.reduce((m,e)=>Math.max(m,+e.dataset.beat),0);
+      const timing = (demo.dataset.timing || '').split(',').map(Number);
+      const typers = [...demo.querySelectorAll('[data-type]')];
+      const buttons = [...demo.querySelectorAll('[data-press]')];
+
+      if(reduce){
+        beatEls.forEach(e=>e.classList.add('in'));
+        demo.querySelectorAll('[data-until]').forEach(e=>e.classList.add('out'));
+        typers.forEach(t=>{ t.textContent = t.dataset.type || ''; });
+        buttons.forEach(b=>{ b.classList.add('dm-pressed'); const l=b.querySelector('.lbl'); if(l&&b.dataset.done) l.textContent=b.dataset.done; });
+        return;
+      }
+
+      let timers = [];
+      const clearAll = ()=>{ timers.forEach(clearTimeout); timers = []; typers.forEach(t=>clearTimeout(t._tt)); };
+      function reset(){
+        beatEls.forEach(e=>e.classList.remove('in'));
+        demo.querySelectorAll('.out').forEach(e=>e.classList.remove('out'));
+        typers.forEach(t=>{ t.textContent=''; const c=t.parentNode.querySelector('.tw-caret'); if(c) c.remove(); });
+        buttons.forEach(b=>{ b.classList.remove('press','dm-pressed'); const l=b.querySelector('.lbl'); if(l&&b.dataset.label) l.textContent=b.dataset.label; });
+      }
+      function showBeat(b){
+        beatEls.forEach(e=>{ if(+e.dataset.beat===b) e.classList.add('in'); });
+        demo.querySelectorAll('[data-until]').forEach(e=>{ if(b>=+e.dataset.until) e.classList.add('out'); });
+        typers.forEach(t=>{ if(+t.dataset.beat===b) typeText(t); });
+        buttons.forEach(btn=>{ if(+btn.dataset.press===b){
+          btn.classList.add('press');
+          setTimeout(()=>{ btn.classList.add('dm-pressed'); const l=btn.querySelector('.lbl'); if(l&&btn.dataset.done) l.textContent=btn.dataset.done; }, 430);
+        }});
+      }
+      function run(){
+        clearAll(); reset();
+        let t = 0;
+        for(let b=0; b<=maxBeat; b++){
+          t += (timing[b] ?? 900);
+          timers.push(setTimeout(()=>showBeat(b), t));
+        }
+        timers.push(setTimeout(run, t + (timing[maxBeat+1] ?? 3000)));
+      }
+      const io = new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting){ run(); io.disconnect(); }}), {threshold:.25});
+      io.observe(demo);
+    }
+    document.querySelectorAll('[data-demo]').forEach(boot);
+  })();
+
+  // ── audit lead capture → Supabase (waitlist table, tagged source) ──
+  (function(){
+    const SUPABASE_URL = 'https://krlgdwppgsfhjhisbcto.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtybGdkd3BwZ3NmaGpoaXNiY3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNjgwMDQsImV4cCI6MjA5Njg0NDAwNH0.4RB4JiT3nfJf-Up0CP4jK7berijWY2Ct88n2Lgm1CHE';
+    async function saveLead(email){
+      const controller = new AbortController();
+      const timeout = setTimeout(()=>controller.abort(), 15000);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method:'POST',
+          headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type':'application/json', Prefer:'return=minimal' },
+          body: JSON.stringify({ email, source:'mena-demo' }),
+          signal: controller.signal,
+        });
+        if (res.ok || res.status === 201 || res.status === 409) return true;
+        console.error('[audit] insert failed:', res.status, await res.text().catch(()=>''));
+        return false;
+      } catch (err) {
+        console.error('[audit] request failed:', err);
+        return false;
+      } finally { clearTimeout(timeout); }
+    }
+    const form = document.getElementById('audit-form');
+    if(!form) return;
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const input = form.querySelector('input[type="email"]');
+      const btn = form.querySelector('button');
+      const email = input.value.trim();
+      if(!email || !input.checkValidity()){ input.reportValidity?.(); input.focus(); return; }
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const ok = await saveLead(email);
+      if(ok){
+        input.style.transition = 'opacity .3s, width .35s, padding .35s, margin .35s';
+        input.style.opacity = '0'; input.style.width = '0'; input.style.minWidth = '0';
+        input.style.padding = '0'; input.style.margin = '0';
+        btn.textContent = '✓ Booked'; btn.classList.add('is-ok'); btn.disabled = true;
+        const s = document.getElementById('audit-success');
+        if(s) setTimeout(()=>{ s.hidden = false; }, 350);
+      } else {
+        btn.disabled = false; btn.textContent = 'Try again';
+      }
+    });
+  })();
+</script>
+</body>
+</html>
